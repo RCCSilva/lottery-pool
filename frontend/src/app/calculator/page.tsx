@@ -464,6 +464,7 @@ export default function CalculatorPage() {
                 id="totalAmount"
                 type="text"
                 placeholder="Ex: R$ 1.000"
+                inputMode="numeric"
                 value={totalAmount}
                 onChange={handleTotalAmountChange}
               />
@@ -478,6 +479,7 @@ export default function CalculatorPage() {
                 id="numberOfQuotes"
                 type="number"
                 min="1"
+                inputMode="numeric"
                 placeholder="Ex: 10"
                 value={numberOfQuotes}
                 onChange={(e) => setNumberOfQuotes(e.target.value)}
