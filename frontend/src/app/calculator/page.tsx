@@ -100,6 +100,10 @@ const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+
+  @media (max-width: 768px) {
+    font-size: 0.85rem;
+  }
 `
 
 const TableHeader = styled.thead`
@@ -124,12 +128,40 @@ const TableHeaderCell = styled.th`
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+
+  &.hide-mobile {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  &.mobile-only {
+    display: none;
+    @media (max-width: 768px) {
+      display: table-cell;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+  }
 `
 
 const TableCell = styled.td`
   padding: 1rem;
   color: #555;
   font-size: 0.95rem;
+
+  @media (max-width: 768px) {
+    padding: 0.75rem 0.5rem;
+  }
+
+  &.hide-mobile {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
 `
 
 const HighlightCell = styled(TableCell)`
@@ -165,6 +197,40 @@ const Button = styled.button`
   &:disabled {
     background: #ccc;
     cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`
+
+const AddButton = styled.button`
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #5568d3;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
   }
 `
 
@@ -217,6 +283,22 @@ const JogoDetails = styled.div`
 
 const ActionCell = styled(TableCell)`
   text-align: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`
+
+const MobileActionCell = styled(TableCell)`
+  display: none;
+  text-align: center;
+  padding: 0.5rem;
+  vertical-align: middle;
+  horizontal-align: center;
+
+  @media (max-width: 768px) {
+    display: table-cell;
+  }
 `
 
 function formatCurrency(value: number): string {
@@ -334,6 +416,9 @@ export default function CalculatorPage() {
 
     const totalCost = selectedBettingForms.reduce((sum, bf) => sum + bf.totalCost, 0)
     const totalGames = selectedBettingForms.reduce((sum, bf) => sum + bf.games.length, 0)
+    const totalVolantes = selectedBettingForms.reduce((sum, bf) => {
+      return sum + Math.floor(bf.games.length / MAX_GAMES_PER_BETTING_FORM)
+    }, 0)
     
     // Check if all betting forms have the same number of quotes
     const firstQuotes = selectedBettingForms[0]?.quotes
@@ -343,22 +428,19 @@ export default function CalculatorPage() {
       bettingForms: selectedBettingForms,
       totalCost,
       totalGames,
+      totalVolantes,
       totalQuotes: allSameQuotes ? firstQuotes : undefined,
     }
   }, [selectedBettingForms])
 
   const addBettingForm = (result: BettingFormCalculationResult) => {
-    // Check if betting form with this dezenas is already added
-    if (!selectedBettingForms.find((bf) => bf.games[0]?.dezenas === result.dezenas)) {
-      const bettingForm = createBettingFormFromResult(result, numberOfQuotesNum)
-      setSelectedBettingForms([...selectedBettingForms, bettingForm])
-    }
+    // Allow adding the same game multiple times
+    const bettingForm = createBettingFormFromResult(result, numberOfQuotesNum)
+    setSelectedBettingForms([...selectedBettingForms, bettingForm])
   }
 
-  const removeBettingForm = (dezenas: number) => {
-    setSelectedBettingForms(selectedBettingForms.filter(
-      (bf) => bf.games[0]?.dezenas !== dezenas
-    ))
+  const removeBettingForm = (index: number) => {
+    setSelectedBettingForms(selectedBettingForms.filter((_, i) => i !== index))
   }
 
   return (
@@ -434,49 +516,58 @@ export default function CalculatorPage() {
                         )}
                       </JogoDetails>
                     </JogoInfo>
-                    <RemoveButton onClick={() => removeBettingForm(dezenas)}>
+                    <RemoveButton onClick={() => removeBettingForm(index)}>
                       Remover
                     </RemoveButton>
                   </JogoItem>
                 )
               })}
             </JogosList>
+            {lotteryPool && (
+              <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#e8f5e9', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div>
+                    <strong>Valor Total:</strong> <span style={{ fontSize: '1.2rem', color: '#27ae60' }}>{formatCurrency(lotteryPool.totalCost)}</span>
+                  </div>
+                  <div>
+                    <strong>Total de Volantes:</strong> <span style={{ fontSize: '1.2rem', color: '#27ae60' }}>{lotteryPool.totalVolantes}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </JogosCard>
         )}
 
         {hasValidInputs && calculationResults.length > 0 && (
           <ResultsCard>
-            <ResultsTitle>Resultados por Tipo de Jogo</ResultsTitle>
+            <ResultsTitle>Grupos</ResultsTitle>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHeaderCell>Dezenas</TableHeaderCell>
-                  <TableHeaderCell>Preço por Jogo</TableHeaderCell>
-                  <TableHeaderCell>Volantes</TableHeaderCell>
-                  <TableHeaderCell>Jogos</TableHeaderCell>
+                  <TableHeaderCell className="hide-mobile">Preço por Jogo</TableHeaderCell>
+                  <TableHeaderCell className="hide-mobile">Volantes</TableHeaderCell>
+                  <TableHeaderCell className="hide-mobile">Jogos</TableHeaderCell>
                   <TableHeaderCell>Custo Total</TableHeaderCell>
                   <TableHeaderCell>Preço por Cota</TableHeaderCell>
-                  <TableHeaderCell>Ação</TableHeaderCell>
+                  <TableHeaderCell className="hide-mobile">Ação</TableHeaderCell>
+                  <TableHeaderCell className="mobile-only" style={{ width: '60px' }}></TableHeaderCell>
                 </TableRow>
               </TableHeader>
               <tbody>
                 {calculationResults.map((result) => {
-                  const isBestValue = bestValue?.dezenas === result.dezenas
-                  const isAlreadyAdded = selectedBettingForms.some(
-                    (bf) => bf.games[0]?.dezenas === result.dezenas
-                  )
                   return (
                     <TableRow key={result.dezenas}>
                       <TableCell>
                         {result.dezenas}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hide-mobile">
                         <Currency>{formatCurrency(result.pricePerGame)}</Currency>
                       </TableCell>
-                      <HighlightCell>
+                      <TableCell className="hide-mobile">
                         {result.bettingFormsPossible}
-                      </HighlightCell>
-                      <TableCell>
+                      </TableCell>
+                      <TableCell className="hide-mobile">
                         {result.actualGamesUsed}
                       </TableCell>
                       <TableCell>
@@ -488,11 +579,20 @@ export default function CalculatorPage() {
                       <ActionCell>
                         <Button
                           onClick={() => addBettingForm(result)}
-                          disabled={isAlreadyAdded || !result.isValid}
+                          disabled={!result.isValid}
                         >
-                          {isAlreadyAdded ? 'Adicionado' : result.isValid ? 'Adicionar' : 'Inválido'}
+                          {result.isValid ? 'Adicionar' : 'Inválido'}
                         </Button>
                       </ActionCell>
+                      <MobileActionCell>
+                        <AddButton
+                          onClick={() => addBettingForm(result)}
+                          disabled={!result.isValid}
+                          title={result.isValid ? 'Adicionar' : 'Inválido'}
+                        >
+                          {result.isValid ? '+' : '✗'}
+                        </AddButton>
+                      </MobileActionCell>
                     </TableRow>
                   )
                 })}

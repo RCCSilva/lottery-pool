@@ -40,6 +40,8 @@ export interface LotteryPool {
   totalCost: number;
   /** Total number of games across all betting forms */
   totalGames: number;
+  /** Total number of volantes (betting forms) */
+  totalVolantes: number;
   /** Total number of quotes (if all volantes have the same quotes, otherwise undefined) */
   totalQuotes?: number;
 }
