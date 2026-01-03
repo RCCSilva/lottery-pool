@@ -9,6 +9,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  basePath: '/lottery-pool',
 }
 
 module.exports = nextConfig
