@@ -65,6 +65,11 @@ export default function Home() {
         <Button href="/calculator">
           Usar Calculadora
         </Button>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+          <Link href="/terms" style={{ color: '#667eea', textDecoration: 'none', fontSize: '0.9rem' }}>
+            Termos e Serviços
+          </Link>
+        </div>
       </Card>
     </Container>
   )
