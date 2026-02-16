@@ -10,7 +10,7 @@ const Container = styled.div`
   justify-content: center;
   min-height: 100vh;
   padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #ebe6df;
 `
 
 const Card = styled.div`
@@ -40,7 +40,7 @@ const Description = styled.p`
 const Button = styled(Link)`
   display: inline-block;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0d9488;
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -50,7 +50,8 @@ const Button = styled(Link)`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 20px rgba(13, 148, 136, 0.4);
+    background: #0f766e;
   }
 `
 
@@ -65,6 +66,11 @@ export default function Home() {
         <Button href="/calculator">
           Usar Calculadora
         </Button>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+          <Link href="/terms" style={{ color: '#0d9488', textDecoration: 'none', fontSize: '0.9rem' }}>
+            Termos e Serviços
+          </Link>
+        </div>
       </Card>
     </Container>
   )

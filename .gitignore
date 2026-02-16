@@ -29,3 +29,9 @@ Thumbs.db
 *.swo
 *~
 
+# Next.js / Vercel
+.vercel
+*.tsbuildinfo
+.pnp
+.pnp.js
+

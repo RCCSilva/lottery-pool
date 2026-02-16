@@ -29,9 +29,9 @@ export interface BettingFormCalculationResult {
   dezenas: number;
   /** Price per game */
   pricePerGame: number;
-  /** Number of complete betting forms (Volantes) possible */
+  /** Number of volantes needed (each holds up to 3 games) */
   bettingFormsPossible: number;
-  /** Actual number of games used (bettingFormsPossible * MAX_GAMES_PER_BETTING_FORM) */
+  /** Actual number of games we can afford and will use */
   actualGamesUsed: number;
   /** Total cost for all betting forms */
   totalCost: number;
